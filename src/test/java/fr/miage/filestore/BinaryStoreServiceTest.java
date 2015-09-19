@@ -21,7 +21,7 @@ public class BinaryStoreServiceTest {
 	
 	@BeforeClass
 	public static void init() {
-		//TODO create service
+		service = new BinaryStoreServiceBean();
 	}
 	
 	@Before
