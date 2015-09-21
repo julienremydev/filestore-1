@@ -13,11 +13,13 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
+import org.filestore.ejb.config.FileStoreConfig;
+
 public class BinaryStoreServiceBean implements BinaryStoreService {
 
 	private static final Logger LOGGER = Logger.getLogger(BinaryStoreServiceBean.class.getName());
 
-	public static final String DEFAULT_BINARY_HOME = "binary-store";
+	public static final String DEFAULT_BINARY_HOME = "binarystore";
 	public static final int DISTINGUISH_SIZE = 2;
 
 	private Path base;
@@ -27,7 +29,7 @@ public class BinaryStoreServiceBean implements BinaryStoreService {
 
 	@PostConstruct
 	public void init() {
-		this.base = Paths.get(System.getProperty("user.home"), DEFAULT_BINARY_HOME);
+		this.base = Paths.get(FileStoreConfig.getHome().toString(), DEFAULT_BINARY_HOME);
 		LOGGER.log(Level.FINEST, "Initializing service with base folder: " + base);
 		try {
 			Files.createDirectories(base);
