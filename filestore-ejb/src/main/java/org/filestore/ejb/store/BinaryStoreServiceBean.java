@@ -1,4 +1,4 @@
-package fr.miage.filestore;
+package org.filestore.ejb.store;
 
 import java.io.IOException;
 import java.io.InputStream;

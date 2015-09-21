@@ -1,63 +1,110 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>fr.miage.jayblanc</groupId>
-  <artifactId>filestore</artifactId>
-  <name>The FileStore Application</name>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  
-  <properties>
-  	<maven.compiler.version>3.3</maven.compiler.version>
-  </properties>
+	<groupId>fr.miage.jayblanc</groupId>
+	<artifactId>filestore</artifactId>
+	<name>The FileStore Application</name>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <organization>
-    <name>Miage Nancy</name>
-    <url>http://www.miage-nancy.fr</url>
-  </organization>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+		<version.compiler.plugin>3.3</version.compiler.plugin>
+		<version.surefire.plugin>2.18.1</version.surefire.plugin>
+		<version.ear.plugin>2.10.1</version.ear.plugin>
+		<version.ejb.plugin>2.5.1</version.ejb.plugin>
+		<version.war.plugin>2.6</version.war.plugin>
+		<version.junit>4.12</version.junit>
+		<version.javaee>7.0</version.javaee>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+	</properties>
 
-  <scm>
-  		<connection>scm:git:git@bitbucket.org:jayblanc/filestore.git</connection>
-  		<developerConnection>scm:git:git@bitbucket.org:jayblanc/filestore.git</developerConnection>
-  		<url>https://bitbucket.org/jayblanc/filestore</url>
-  </scm>
+	<organization>
+		<name>Miage Nancy</name>
+		<url>http://www.miage-nancy.fr</url>
+	</organization>
 
-  <developers>
-    <developer>
-      <id>jayblanc</id>
-      <name>Jerome Blanchard</name>
-      <email>jayblanc@gmail.com</email>
-      <url>http://wiki.jayblanc.fr</url>
-      <organization>ATILF - CNRS</organization>
-      <organizationUrl>http://www.atilf.fr</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>Europe/Paris</timezone>
-    </developer>
-  </developers>
+	<scm>
+		<connection>scm:git:git@bitbucket.org:jayblanc/filestore.git</connection>
+		<developerConnection>scm:git:git@bitbucket.org:jayblanc/filestore.git</developerConnection>
+		<url>https://bitbucket.org/jayblanc/filestore</url>
+	</scm>
 
-  <dependencies>
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<version>4.11</version>
-  		<scope>test</scope>
-  	</dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.version}</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<developers>
+		<developer>
+			<id>jayblanc</id>
+			<name>Jerome Blanchard</name>
+			<email>jerome.blanchard@atilf.fr</email>
+			<url>http://wiki.jayblanc.fr</url>
+			<organization>ATILF - CNRS</organization>
+			<organizationUrl>http://www.atilf.fr</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Paris</timezone>
+		</developer>
+	</developers>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-api</artifactId>
+				<version>${version.javaee}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax</groupId>
+				<artifactId>javaee-web-api</artifactId>
+				<version>${version.javaee}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>fr.miage.jayblanc</groupId>
+				<artifactId>filestore-ejb</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>fr.miage.jayblanc</groupId>
+				<artifactId>filestore-web</artifactId>
+				<version>${project.version}</version>
+				<type>war</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${version.junit}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.wildfly.plugins</groupId>
+					<artifactId>wildfly-maven-plugin</artifactId>
+					<version>${version.wildfly.maven.plugin}</version>
+					<inherited>true</inherited>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<modules>
+		<module>filestore-ejb</module>
+		<module>filestore-web</module>
+		<module>filestore-ear</module>
+	</modules>
 </project>

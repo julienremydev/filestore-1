@@ -1,4 +1,4 @@
-package fr.miage.filestore;
+package org.filestore.ejb.store;
 
 public class BinaryStreamNotFoundException extends Exception {
 
