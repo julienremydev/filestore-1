@@ -1,5 +1,6 @@
 package org.filestore.ejb.file.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -7,11 +8,18 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-public class FileItem {
+@NamedQueries({ 
+	@NamedQuery(name = "listAllFiles", query = "SELECT fi FROM FileItem fi") 
+})
+public class FileItem implements Serializable {
+
+	private static final long serialVersionUID = -1869502504816752908L;
 
 	@Id
 	private String id;

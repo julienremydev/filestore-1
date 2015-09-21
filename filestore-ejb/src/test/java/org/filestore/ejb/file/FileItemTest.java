@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import java.sql.DriverManager;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,6 +87,41 @@ public class FileItemTest {
             FileItem file2 = em.find(FileItem.class, "myid");
             assertNotNull(file2);
             assertEquals(file, file2);
+            
+            assertEquals("Tagada", file2.getName());
+            file2.setName("A new Name");
+            List<String> receivers = new ArrayList<String>();
+            receivers.add("user1@test.com");
+            receivers.add("user2@test.com");
+            file2.setReceivers(receivers);
+            em.merge(file2);
+            FileItem file3 = em.find(FileItem.class, "myid");
+            assertEquals("A new Name", file3.getName());
+            
+            List<FileItem> items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+            assertEquals(1, items.size());
+            
+            FileItem file4 = new FileItem();
+            file4.setId("myid2");
+            file4.setName("Tagada2");
+            file4.setLength(20);
+            file4.setMessage("this is another message");
+            file4.setOwner("miage");
+            file4.setType("text/plain");
+            List<String> receivers4 = new ArrayList<String>();
+            receivers4.add("user2@test.com");
+            receivers4.add("user3@test.com");
+            file4.setReceivers(receivers4);
+            em.persist(file4);
+            
+            items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+            assertEquals(2, items.size());
+            
+            FileItem file5 = em.find(FileItem.class, "myid2");
+            assertEquals(2, file5.getReceivers().size());
+            for ( String receiver : file5.getReceivers() ) {
+            	LOGGER.log(Level.INFO, "receiver: " + receiver);
+            }
 
             em.getTransaction().commit();
 
