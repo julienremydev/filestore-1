@@ -10,8 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,14 +20,7 @@ public class BinaryStoreServiceTest {
 	@BeforeClass
 	public static void init() {
 		service = new BinaryStoreServiceBean();
-	}
-	
-	@Before
-	public void prepare() {
-	}
-	
-	@After
-	public void clean() {
+		((BinaryStoreServiceBean)service).init();
 	}
 	
 	@Test
@@ -59,7 +50,7 @@ public class BinaryStoreServiceTest {
 				baos.write(b);
 			}
 			String retreive = new String(baos.toByteArray()); 
-			assertEquals(retreive, original);
+			assertEquals(retreive, content);
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
