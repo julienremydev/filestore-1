@@ -17,6 +17,7 @@
 		<version.ejb.plugin>2.5.1</version.ejb.plugin>
 		<version.war.plugin>2.6</version.war.plugin>
 		<version.junit>4.12</version.junit>
+		<version.jmock>2.8.1</version.jmock>
 		<version.javaee>7.0</version.javaee>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
@@ -32,7 +33,7 @@
 		<developerConnection>scm:git:git@bitbucket.org:jayblanc/filestore.git</developerConnection>
 		<url>https://bitbucket.org/jayblanc/filestore</url>
 	</scm>
-	
+
 	<repositories>
 		<repository>
 			<id>filestore-maven-repository</id>
@@ -108,9 +109,15 @@
 				<version>${version.junit}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.jmock</groupId>
+				<artifactId>jmock-junit4</artifactId>
+				<version>${version.jmock}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>filestore-maven-repository</id>
