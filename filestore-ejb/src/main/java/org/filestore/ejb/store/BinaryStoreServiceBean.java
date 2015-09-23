@@ -19,7 +19,7 @@ import javax.ejb.Startup;
 import org.filestore.ejb.config.FileStoreConfig;
 
 @Startup
-@Singleton(name="binary-store")
+@Singleton(name="binarystore")
 @Local(BinaryStoreService.class)
 public class BinaryStoreServiceBean implements BinaryStoreService {
 

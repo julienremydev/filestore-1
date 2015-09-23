@@ -21,7 +21,7 @@ public class FileServiceBean implements FileService {
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
 	
 	@PersistenceContext(unitName="filestore-pu")
-	private EntityManager em;
+	protected EntityManager em;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
