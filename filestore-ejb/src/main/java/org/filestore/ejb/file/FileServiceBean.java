@@ -1,6 +1,7 @@
 package org.filestore.ejb.file;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -13,6 +14,12 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -33,6 +40,8 @@ public class FileServiceBean implements FileService {
 	protected SessionContext ctx;
 	@EJB
 	protected BinaryStoreService store;
+	@Resource(name = "mail/filestore")  
+	private Session session;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -121,6 +130,25 @@ public class FileServiceBean implements FileService {
 		}	
 	}
 
+	private void notifyOwner(String owner, String id) throws MessagingException, UnsupportedEncodingException {
+		javax.mail.Message msg = new MimeMessage(session);  
+		msg.setSubject("Your file has been received");  
+		msg.setRecipient(RecipientType.TO,new InternetAddress(owner));  
+		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+		msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
+				+ GET_FILE_URL_PREFIX + id, "text/html");
+		Transport.send(msg);  
+	}
 	
+	private void notifyReceiver(String receiver, String id, String message) throws MessagingException, UnsupportedEncodingException {
+		javax.mail.Message msg = new MimeMessage(session);  
+		msg.setSubject("Notification");
+		msg.setRecipient(RecipientType.TO,new InternetAddress(receiver));
+		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+		msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
+				+ GET_FILE_URL_PREFIX + id + "<br/><br/>" 
+				+ "The sender lets you a message :<br/><br/>" + message, "text/html");
+		Transport.send(msg);  
+	}
 
 }

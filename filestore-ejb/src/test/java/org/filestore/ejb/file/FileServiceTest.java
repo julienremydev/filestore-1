@@ -36,7 +36,6 @@ public class FileServiceTest {
     private static EntityManager em;
     private static FileService service;
     private static BinaryStoreService store;
-    
     private static Mockery context = new Mockery();
 
 	@BeforeClass
