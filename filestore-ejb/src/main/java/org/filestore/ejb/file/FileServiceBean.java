@@ -14,6 +14,8 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -43,6 +45,8 @@ public class FileServiceBean implements FileService {
 	protected BinaryStoreService store;
 	@Resource(name = "java:jboss/mail/Default")  
 	private Session session;
+	@Resource(name = "DefaultManagedExecutorService")
+	private ManagedExecutorService executor;
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -59,6 +63,12 @@ public class FileServiceBean implements FileService {
 			file.setName(name);
 			file.setStream(streamid);
 			em.persist(file);
+			
+			executor.submit(new OwnerNotifier(owner, id));
+			for ( String receiver : receivers ) {
+				executor.submit(new ReceiverNotifier(receiver, id, message));
+			}
+			
 			return id;
 		} catch ( BinaryStoreServiceException e ) {
 			LOGGER.log(Level.SEVERE, "An error occured during storing binary content", e);
@@ -131,25 +141,61 @@ public class FileServiceBean implements FileService {
 		}	
 	}
 
-	private void notifyOwner(String owner, String id) throws MessagingException, UnsupportedEncodingException {
-		javax.mail.Message msg = new MimeMessage(session);  
-		msg.setSubject("Your file has been received");  
-		msg.setRecipient(RecipientType.TO,new InternetAddress(owner));  
-		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
-		msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
-				+ FileStoreConfig.getDownloadBaseUrl() + id, "text/html");
-		Transport.send(msg);  
+	class OwnerNotifier implements Runnable {
+		
+		private String owner;
+		private String id;
+		
+		public OwnerNotifier(String owner, String id) {
+			this.owner = owner;
+			this.id = id;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Message msg = new MimeMessage(session);  
+				msg.setSubject("Your file has been received");  
+				msg.setRecipient(RecipientType.TO,new InternetAddress(owner));  
+				msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+				msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
+						+ FileStoreConfig.getDownloadBaseUrl() + id, "text/html");
+				Transport.send(msg);
+			} catch ( Exception e ) {
+				LOGGER.log(Level.SEVERE, "unable to notify owner", e);
+			}
+		}
+	
 	}
 	
-	private void notifyReceiver(String receiver, String id, String message) throws MessagingException, UnsupportedEncodingException {
-		javax.mail.Message msg = new MimeMessage(session);  
-		msg.setSubject("Notification");
-		msg.setRecipient(RecipientType.TO,new InternetAddress(receiver));
-		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
-		msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
-				+ FileStoreConfig.getDownloadBaseUrl() + id + "<br/><br/>" 
-				+ "The sender lets you a message :<br/><br/>" + message, "text/html");
-		Transport.send(msg);  
+    class ReceiverNotifier implements Runnable {
+		
+		private String receiver;
+		private String id;
+		private String message;
+		
+		public ReceiverNotifier(String receiver, String id, String message) {
+			this.receiver = receiver;
+			this.id = id;
+			this.message = message;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Message msg = new MimeMessage(session);  
+				msg.setSubject("Notification");
+				msg.setRecipient(RecipientType.TO,new InternetAddress(receiver));
+				msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+				msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
+						+ FileStoreConfig.getDownloadBaseUrl() + id + "<br/><br/>" 
+						+ "The sender lets you a message :<br/><br/>" + message, "text/html");
+				Transport.send(msg);  
+			} catch ( Exception e ) {
+				LOGGER.log(Level.SEVERE, "unable to notify owner", e);
+			}
+		}
+	
 	}
 
 }
