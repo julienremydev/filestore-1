@@ -23,6 +23,7 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.filestore.ejb.config.FileStoreConfig;
 import org.filestore.ejb.file.entity.FileItem;
 import org.filestore.ejb.store.BinaryStoreService;
 import org.filestore.ejb.store.BinaryStoreServiceException;
@@ -40,7 +41,7 @@ public class FileServiceBean implements FileService {
 	protected SessionContext ctx;
 	@EJB
 	protected BinaryStoreService store;
-	@Resource(name = "mail/filestore")  
+	@Resource(name = "java:jboss/mail/Default")  
 	private Session session;
 
 	@Override
@@ -136,7 +137,7 @@ public class FileServiceBean implements FileService {
 		msg.setRecipient(RecipientType.TO,new InternetAddress(owner));  
 		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
 		msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
-				+ GET_FILE_URL_PREFIX + id, "text/html");
+				+ FileStoreConfig.getDownloadBaseUrl() + id, "text/html");
 		Transport.send(msg);  
 	}
 	
@@ -146,7 +147,7 @@ public class FileServiceBean implements FileService {
 		msg.setRecipient(RecipientType.TO,new InternetAddress(receiver));
 		msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
 		msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
-				+ GET_FILE_URL_PREFIX + id + "<br/><br/>" 
+				+ FileStoreConfig.getDownloadBaseUrl() + id + "<br/><br/>" 
 				+ "The sender lets you a message :<br/><br/>" + message, "text/html");
 		Transport.send(msg);  
 	}
