@@ -3,9 +3,7 @@ package org.filestore.ejb.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -62,20 +60,18 @@ public class FileServiceMetricsTest {
 		
 		List<String> receivers = new ArrayList<String> ();
 		receivers.add("sheldon@tbbt.org");
-		ByteArrayInputStream stream = new ByteArrayInputStream("BAZINGA !!".getBytes());
-		String key = service.postFile("jayblanc@gmail.com", receivers, "This is a message for you", "file.txt", stream);
+		String key = service.postFile("jayblanc@gmail.com", receivers, "This is a message for you", "file.txt", "BAZINGA !!".getBytes());
 		assertNotNull(key);
 		
 		int nbdownloads = 3;
 		for (int i=0; i<nbdownloads; i++) {
-			InputStream is = service.getFileContent(key);
-			is.close();
+			service.getWholeFileContent(key);
 		}
 		
 		int uploadsAfter = metrics.getTotalUploads();
 		int downloadAfter = metrics.getTotalDownloads();
-		assertEquals(uploadsAfter, uploadsBefore + 1);
-		assertEquals(downloadAfter, downloadsBefore + nbdownloads);
+		assertEquals(uploadsBefore + 1, uploadsAfter);
+		assertEquals(downloadsBefore + nbdownloads, downloadAfter);
 
 	}
 

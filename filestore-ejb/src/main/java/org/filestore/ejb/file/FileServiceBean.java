@@ -1,13 +1,16 @@
 package org.filestore.ejb.file;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
@@ -15,9 +18,9 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.interceptor.Interceptors;
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -27,12 +30,14 @@ import javax.persistence.PersistenceContext;
 
 import org.filestore.ejb.config.FileStoreConfig;
 import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.ejb.file.metrics.FileServiceMetricsBean;
 import org.filestore.ejb.store.BinaryStoreService;
 import org.filestore.ejb.store.BinaryStoreServiceException;
 import org.filestore.ejb.store.BinaryStreamNotFoundException;
 
 @Stateless(name = "fileservice")
 @Remote(FileService.class)
+@Interceptors ({FileServiceMetricsBean.class})
 public class FileServiceBean implements FileService {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
@@ -49,9 +54,23 @@ public class FileServiceBean implements FileService {
 	private ManagedExecutorService executor;
 
 	@Override
+	@Asynchronous
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String postFile(String owner, List<String> receivers, String message, String name, byte[] data) throws FileServiceException {
+		LOGGER.log(Level.INFO, "Post File called (byte[])");
+		return this.internalPostFile(owner, receivers, message, name, new ByteArrayInputStream(data));
+	}
+	
+	@Override
+	@Asynchronous
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public String postFile(String owner, List<String> receivers, String message, String name, InputStream stream) throws FileServiceException {
-		LOGGER.log(Level.INFO, "Post File called");
+		LOGGER.log(Level.INFO, "Post File called (InputStream)");
+		return this.internalPostFile(owner, receivers, message, name, stream);
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	private String internalPostFile(String owner, List<String> receivers, String message, String name, InputStream stream) throws FileServiceException {
 		try {
 			String streamid = store.put(stream);
 			String id = UUID.randomUUID().toString().replaceAll("-", "");
@@ -64,11 +83,16 @@ public class FileServiceBean implements FileService {
 			file.setStream(streamid);
 			em.persist(file);
 			
-			executor.submit(new OwnerNotifier(owner, id));
+			this.notifyOwner(owner, id);
 			for ( String receiver : receivers ) {
-				executor.submit(new ReceiverNotifier(receiver, id, message));
+				this.notifyReceiver(receiver, id, message);
 			}
 			
+//			executor.submit(new OwnerNotifier(owner, id));
+//			for ( String receiver : receivers ) {
+//				executor.submit(new ReceiverNotifier(receiver, id, message));
+//			}
+					
 			return id;
 		} catch ( BinaryStoreServiceException e ) {
 			LOGGER.log(Level.SEVERE, "An error occured during storing binary content", e);
@@ -100,6 +124,37 @@ public class FileServiceBean implements FileService {
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public InputStream getFileContent(String id) throws FileServiceException {
 		LOGGER.log(Level.INFO, "Get File Content called");
+		return this.internalGetFileContent(id);
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public byte[] getWholeFileContent(String id) throws FileServiceException {
+		LOGGER.log(Level.INFO, "Get Whole File Content called");
+		InputStream is = this.internalGetFileContent(id);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			byte[] buffer = new byte[1024];
+			int len = 0;
+			while ( (len=is.read(buffer)) != -1) {
+			    baos.write(buffer, 0, len);
+			}
+		} catch (IOException e) {
+			throw new FileServiceException("unable to copy stream", e);
+		} finally {
+			try {
+				baos.flush();
+				baos.close();
+				is.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, "error during closing streams", e);
+			}
+		}
+		return baos.toByteArray();
+	}
+	
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	private InputStream internalGetFileContent(String id) throws FileServiceException {
 		try {
 			FileItem item = em.find(FileItem.class, id);
 			if ( item == null ) {
@@ -140,6 +195,37 @@ public class FileServiceBean implements FileService {
 			throw new FileServiceException(e);
 		}	
 	}
+	
+	private void notifyOwner(String owner, String id) {
+		try {
+			Message msg = new MimeMessage(session);  
+			msg.setSubject("Your file has been received");  
+			msg.setRecipient(RecipientType.TO,new InternetAddress(owner));  
+			msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+			msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
+					+ FileStoreConfig.getDownloadBaseUrl() + id, "text/html");
+			Thread.sleep(5000);
+			Transport.send(msg);
+		} catch ( Exception e ) {
+			LOGGER.log(Level.SEVERE, "unable to notify owner", e);
+		}
+	}
+	
+	private void notifyReceiver(String receiver, String id, String message) {
+		try {
+			Message msg = new MimeMessage(session);  
+			msg.setSubject("Notification");
+			msg.setRecipient(RecipientType.TO,new InternetAddress(receiver));
+			msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
+			msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
+					+ FileStoreConfig.getDownloadBaseUrl() + id + "<br/><br/>" 
+					+ "The sender lets you a message :<br/><br/>" + message, "text/html");
+			Thread.sleep(5000);
+			Transport.send(msg);  
+		} catch ( Exception e ) {
+			LOGGER.log(Level.SEVERE, "unable to notify owner", e);
+		}
+	}
 
 	class OwnerNotifier implements Runnable {
 		
@@ -160,6 +246,7 @@ public class FileServiceBean implements FileService {
 				msg.setFrom(new InternetAddress("admin@filexchange.org","FileXChange"));  
 				msg.setContent("Hi, this mail confirm the upload of your file. The file will be accessible at url : " 
 						+ FileStoreConfig.getDownloadBaseUrl() + id, "text/html");
+				Thread.sleep(5000);
 				Transport.send(msg);
 			} catch ( Exception e ) {
 				LOGGER.log(Level.SEVERE, "unable to notify owner", e);
@@ -190,6 +277,7 @@ public class FileServiceBean implements FileService {
 				msg.setContent("Hi, a file has been uploaded for you and is accessible at url : <br/><br/>" 
 						+ FileStoreConfig.getDownloadBaseUrl() + id + "<br/><br/>" 
 						+ "The sender lets you a message :<br/><br/>" + message, "text/html");
+				Thread.sleep(5000);
 				Transport.send(msg);  
 			} catch ( Exception e ) {
 				LOGGER.log(Level.SEVERE, "unable to notify owner", e);

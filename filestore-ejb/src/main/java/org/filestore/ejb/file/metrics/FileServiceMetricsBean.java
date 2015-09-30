@@ -29,6 +29,9 @@ public class FileServiceMetricsBean implements FileServiceMetrics {
 			if ( ic.getMethod().getName().equals("getFileContent") ) {
 				downloads++;
 			}
+			if ( ic.getMethod().getName().equals("getWholeFileContent") ) {
+				downloads++;
+			}
 			if ( ic.getMethod().getName().equals("postFile") ) {
 				uploads++;
 			}

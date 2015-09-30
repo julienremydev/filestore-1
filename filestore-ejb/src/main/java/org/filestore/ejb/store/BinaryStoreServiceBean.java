@@ -61,6 +61,12 @@ public class BinaryStoreServiceBean implements BinaryStoreService {
 			Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			throw new BinaryStoreServiceException("unexpected error during stream copy", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, "unable to close stream", e);
+			}
 		}
 		return key;
 	}
