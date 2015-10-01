@@ -15,7 +15,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({ 
-	@NamedQuery(name = "listAllFiles", query = "SELECT fi FROM FileItem fi") 
+	@NamedQuery(name = "listAllFiles", query = "SELECT fi FROM FileItem fi"),
+	@NamedQuery(name = "findExpiredFiles", query = "SELECT fi FROM FileItem fi WHERE fi.lastdownload < :limit") 
 })
 public class FileItem implements Serializable {
 

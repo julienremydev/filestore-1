@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
+import javax.ejb.Schedule;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -22,6 +24,7 @@ import javax.jms.JMSContext;
 import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 
 import org.filestore.ejb.file.entity.FileItem;
 import org.filestore.ejb.file.metrics.FileServiceMetricsBean;
@@ -176,7 +179,24 @@ public class FileServiceBean implements FileService {
 			LOGGER.log(Level.SEVERE, "unexpected error during deleting file", e);
 			ctx.setRollbackOnly();
 			throw new FileServiceException(e);
-		}	
+		}
+	}
+	
+	@Schedule(minute="*/10", hour="*")
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void cleanExpiredFiles() {
+		LOGGER.log(Level.INFO, "Clean Expired File called");
+		Date limit = new Date(System.currentTimeMillis() - 600000);
+		List<FileItem> items = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).getResultList();
+		LOGGER.log(Level.INFO, items.size() + " files expired found, cleaning...");
+		for (FileItem item : items) {
+			em.remove(item);
+			try {
+				store.delete(item.getStream());
+			} catch ( BinaryStreamNotFoundException | BinaryStoreServiceException e ) {
+				LOGGER.log(Level.WARNING, "unable to delete binary content, may result in orphean file", e);
+			}
+		}
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
