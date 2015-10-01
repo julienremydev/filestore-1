@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.batch.operations.JobOperator;
+import javax.batch.runtime.BatchRuntime;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.Schedule;
@@ -35,7 +38,7 @@ import org.filestore.ejb.store.BinaryStreamNotFoundException;
 @Stateless(name = "fileservice")
 @Remote(FileService.class)
 @Interceptors ({FileServiceMetricsBean.class})
-public class FileServiceBean implements FileService {
+public class FileServiceBean implements FileService, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
 	
@@ -182,21 +185,45 @@ public class FileServiceBean implements FileService {
 		}
 	}
 	
-	@Schedule(minute="*/10", hour="*")
+	@Override
+	public List<FileItem> listAllFiles() throws FileServiceException {
+		LOGGER.log(Level.INFO, "Listing all files");
+		List<FileItem> items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+		return items;
+	}
+
+	@Override
+	public FileItem getNextStaleFile() throws FileServiceException {
+		LOGGER.log(Level.INFO, "Getting next stale files");
+		Date limit = new Date(System.currentTimeMillis() - 60000);
+		try {
+			FileItem item = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).setMaxResults(1).getSingleResult();
+			LOGGER.log(Level.INFO, "next stale file item found: " + item.getId());
+			return item;
+		} catch ( Exception e ) {
+			LOGGER.log(Level.INFO, "no stale file item found: " + e.getMessage());
+			return null;
+		}
+	}
+	
+	@Schedule(minute="*/2", hour="*")
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cleanExpiredFiles() {
 		LOGGER.log(Level.INFO, "Clean Expired File called");
-		Date limit = new Date(System.currentTimeMillis() - 600000);
-		List<FileItem> items = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).getResultList();
-		LOGGER.log(Level.INFO, items.size() + " files expired found, cleaning...");
-		for (FileItem item : items) {
-			em.remove(item);
-			try {
-				store.delete(item.getStream());
-			} catch ( BinaryStreamNotFoundException | BinaryStoreServiceException e ) {
-				LOGGER.log(Level.WARNING, "unable to delete binary content, may result in orphean file", e);
-			}
-		}
+//		Date limit = new Date(System.currentTimeMillis() - 600000);
+//		List<FileItem> items = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).getResultList();
+//		LOGGER.log(Level.INFO, items.size() + " files expired found, cleaning...");
+//		for (FileItem item : items) {
+//			em.remove(item);
+//			try {
+//				store.delete(item.getStream());
+//			} catch ( BinaryStreamNotFoundException | BinaryStoreServiceException e ) {
+//				LOGGER.log(Level.WARNING, "unable to delete binary content, may result in orphean file", e);
+//			}
+//		}
+		JobOperator jo = BatchRuntime.getJobOperator();
+        long jid = jo.start("purge", new Properties());
+        LOGGER.log(Level.INFO, "batch job started with id: " + jid);
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)

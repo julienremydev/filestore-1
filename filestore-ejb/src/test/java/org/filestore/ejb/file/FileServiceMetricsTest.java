@@ -41,8 +41,10 @@ public class FileServiceMetricsTest {
 		jar.addPackage("org.filestore.ejb.file");
 		jar.addPackage("org.filestore.ejb.file.entity");
 		jar.addPackage("org.filestore.ejb.file.metrics");
+		jar.addPackage("org.filestore.ejb.file.jobs");
 		jar.addPackage("org.filestore.ejb.store");
 		jar.addAsManifestResource("test-persistence.xml", "persistence.xml");
+		jar.addAsManifestResource("META-INF/batch-jobs/purge.xml", "META-INF/batch-jobs/purge.xml");
 		LOGGER.log(Level.INFO, "Created JAR for test : " + jar.toString(true));
 
 		EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "filestore-ear.ear");
@@ -72,6 +74,8 @@ public class FileServiceMetricsTest {
 		int downloadAfter = metrics.getTotalDownloads();
 		assertEquals(uploadsBefore + 1, uploadsAfter);
 		assertEquals(downloadsBefore + nbdownloads, downloadAfter);
+		
+		
 
 	}
 
