@@ -3,8 +3,11 @@ package org.filestore.ejb.file;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.ejb.Remote;
+
 import org.filestore.ejb.file.entity.FileItem;
 
+@Remote
 public interface FileService {
 	
 	public String postFile(String owner, List<String> receivers, String message, String name, InputStream stream) throws FileServiceException;

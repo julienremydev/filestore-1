@@ -15,7 +15,6 @@ import javax.annotation.Resource;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.ejb.EJB;
-import javax.ejb.Remote;
 import javax.ejb.Schedule;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -36,7 +35,6 @@ import org.filestore.ejb.store.BinaryStoreServiceException;
 import org.filestore.ejb.store.BinaryStreamNotFoundException;
 
 @Stateless(name = "fileservice")
-@Remote(FileService.class)
 @Interceptors ({FileServiceMetricsBean.class})
 public class FileServiceBean implements FileService, FileServiceAdmin {
 	
