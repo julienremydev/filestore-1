@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.ArrayList;
@@ -17,6 +19,11 @@ import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
 
 import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.ejb.store.BinaryStoreService;
+import org.filestore.ejb.store.BinaryStoreServiceException;
+import org.filestore.ejb.store.BinaryStreamNotFoundException;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +35,8 @@ public class FileServiceTest {
 	private static EntityManagerFactory factory;
     private static EntityManager em;
     private static FileService service;
+    private static BinaryStoreService store;
+    private static Mockery context = new Mockery();
 
 	@BeforeClass
     public static void setUp() throws Exception {
@@ -50,6 +59,9 @@ public class FileServiceTest {
         LOGGER.log(Level.INFO, "Building FileService");
         service = new FileServiceBean();
         ((FileServiceBean)service).em = em;
+
+        store = context.mock(BinaryStoreService.class);
+        ((FileServiceBean)service).store = store;
     }
 
     @AfterClass
@@ -72,15 +84,21 @@ public class FileServiceTest {
     }
     
     @Test
-    public void testPostAndDeleteFile() throws FileServiceException {
+    public void testPostAndDeleteFile() throws FileServiceException, BinaryStoreServiceException, BinaryStreamNotFoundException {
     	try {
 	    	em.getTransaction().begin();
+	    	
+	    	context.checking(new Expectations() {{
+	    	     oneOf (store).put(with(any(InputStream.class)));
+	    	     oneOf (store).delete(with(any(String.class)));
+	    	}});
 	    	
 	    	List<String> receivers = new ArrayList<String> ();
 	    	receivers.add("sheldon@test.com");
 	    	receivers.add("rajesh@test.com");
 	    	receivers.add("penny@test.com");
-	    	String key = service.postFile("jayblanc@gmail.com", receivers, "Bazinga", "The.Big.Bang.Theory.S06E01.mkv", "this should be a uuid");
+	    	InputStream is = new ByteArrayInputStream("this is some sample content".getBytes());
+	    	String key = service.postFile("jayblanc@gmail.com", receivers, "Bazinga", "The.Big.Bang.Theory.S06E01.mkv", is);
 	    	assertNotNull(key);
 	    	
 	    	FileItem item = service.getFile(key);
@@ -95,6 +113,8 @@ public class FileServiceTest {
 	    	} catch ( FileServiceException e ) {
 	    		//
 	    	}
+	    	
+	    	context.assertIsSatisfied();
 	    	
 	    	em.getTransaction().commit();
     	}  catch (IllegalStateException | RollbackException e) {
