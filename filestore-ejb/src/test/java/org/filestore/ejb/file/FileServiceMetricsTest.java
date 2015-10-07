@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -11,7 +12,11 @@ import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.naming.InitialContext;
+import javax.security.auth.Subject;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
+import org.filestore.ejb.file.entity.FileItem;
 import org.filestore.ejb.file.metrics.FileServiceMetrics;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -29,6 +34,8 @@ public class FileServiceMetricsTest {
 
 	@EJB
 	private FileService service;
+	@EJB
+	private FileServiceAdmin admin;
 	@EJB
 	private FileServiceMetrics metrics;
 	@ArquillianResource
@@ -56,24 +63,47 @@ public class FileServiceMetricsTest {
 
 	@Test
 	public void testUploadFiles() throws FileServiceException, IOException {
-		
+
 		int uploadsBefore = metrics.getTotalUploads();
 		int downloadsBefore = metrics.getTotalDownloads();
-		
-		List<String> receivers = new ArrayList<String> ();
+
+		List<String> receivers = new ArrayList<String>();
 		receivers.add("sheldon@tbbt.org");
 		String key = service.postFile("jayblanc@gmail.com", receivers, "This is a message for you", "file.txt", "BAZINGA !!".getBytes());
 		assertNotNull(key);
-		
+
 		int nbdownloads = 3;
-		for (int i=0; i<nbdownloads; i++) {
+		for (int i = 0; i < nbdownloads; i++) {
 			service.getWholeFileContent(key);
 		}
-		
+
 		int uploadsAfter = metrics.getTotalUploads();
 		int downloadAfter = metrics.getTotalDownloads();
 		assertEquals(uploadsBefore + 1, uploadsAfter);
 		assertEquals(downloadsBefore + nbdownloads, downloadAfter);
+
+	}
+
+	@Test
+	public void testListAllFiles() throws LoginException {
+		LoginContext loginContext = JBossLoginContextFactory.createLoginContext("root", "tagada54");
+		loginContext.login();
+		try {
+			Subject.doAs(loginContext.getSubject(), new PrivilegedAction<List<FileItem>>() {
+				@Override
+				public List<FileItem> run() {
+					try {
+						List<FileItem> items = admin.listAllFiles();
+						return items;
+					} catch (FileServiceException e) {
+						e.printStackTrace();
+					}
+					return null;
+				}
+			});
+		} finally {
+			loginContext.logout();
+		}
 	}
 
 }
