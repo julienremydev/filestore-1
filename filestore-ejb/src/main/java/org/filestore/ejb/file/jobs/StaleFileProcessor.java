@@ -3,6 +3,7 @@ package org.filestore.ejb.file.jobs;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.security.RunAs;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -12,6 +13,7 @@ import org.filestore.ejb.file.FileServiceException;
 import org.filestore.ejb.file.entity.FileItem;
 
 @Named(value="staleFileProcessor")
+@RunAs("system")
 public class StaleFileProcessor implements ItemProcessor {
 
 	private static final Logger LOGGER = Logger.getLogger(StaleFileProcessor.class.getName());

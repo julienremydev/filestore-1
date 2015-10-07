@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.annotation.security.RolesAllowed;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.ejb.EJB;
@@ -184,6 +185,8 @@ public class FileServiceBean implements FileService, FileServiceAdmin {
 	}
 	
 	@Override
+	@RolesAllowed({"admin", "system"})
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<FileItem> listAllFiles() throws FileServiceException {
 		LOGGER.log(Level.INFO, "Listing all files");
 		List<FileItem> items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
@@ -191,6 +194,8 @@ public class FileServiceBean implements FileService, FileServiceAdmin {
 	}
 
 	@Override
+	@RolesAllowed({"admin", "system"})
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public FileItem getNextStaleFile() throws FileServiceException {
 		LOGGER.log(Level.INFO, "Getting next stale files");
 		Date limit = new Date(System.currentTimeMillis() - 60000);
@@ -208,17 +213,6 @@ public class FileServiceBean implements FileService, FileServiceAdmin {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void cleanExpiredFiles() {
 		LOGGER.log(Level.INFO, "Clean Expired File called");
-//		Date limit = new Date(System.currentTimeMillis() - 600000);
-//		List<FileItem> items = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).getResultList();
-//		LOGGER.log(Level.INFO, items.size() + " files expired found, cleaning...");
-//		for (FileItem item : items) {
-//			em.remove(item);
-//			try {
-//				store.delete(item.getStream());
-//			} catch ( BinaryStreamNotFoundException | BinaryStoreServiceException e ) {
-//				LOGGER.log(Level.WARNING, "unable to delete binary content, may result in orphean file", e);
-//			}
-//		}
 		JobOperator jo = BatchRuntime.getJobOperator();
         long jid = jo.start("purge", new Properties());
         LOGGER.log(Level.INFO, "batch job started with id: " + jid);

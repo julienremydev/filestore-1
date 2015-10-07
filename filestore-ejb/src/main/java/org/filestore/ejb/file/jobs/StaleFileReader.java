@@ -3,6 +3,7 @@ package org.filestore.ejb.file.jobs;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.security.RunAs;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -12,6 +13,7 @@ import org.filestore.ejb.file.FileServiceException;
 import org.filestore.ejb.file.entity.FileItem;
 
 @Named(value="staleFileReader")
+@RunAs("system")
 public class StaleFileReader extends AbstractItemReader {
 	
 	private static final Logger LOGGER = Logger.getLogger(StaleFileReader.class.getName());
