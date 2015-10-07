@@ -74,9 +74,6 @@ public class FileServiceMetricsTest {
 		int downloadAfter = metrics.getTotalDownloads();
 		assertEquals(uploadsBefore + 1, uploadsAfter);
 		assertEquals(downloadsBefore + nbdownloads, downloadAfter);
-		
-		
-
 	}
 
 }
