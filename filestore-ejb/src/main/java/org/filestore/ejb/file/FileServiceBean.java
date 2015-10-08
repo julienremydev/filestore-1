@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,15 +13,11 @@ import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.ejb.EJB;
-import javax.ejb.Schedule;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSContext;
@@ -212,15 +207,6 @@ public class FileServiceBean implements FileService, FileServiceAdmin {
 			LOGGER.log(Level.INFO, "no stale file item found: " + e.getMessage());
 			return null;
 		}
-	}
-	
-	@Schedule(minute="*/2", hour="*")
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public void cleanExpiredFiles() {
-		LOGGER.log(Level.INFO, "Clean Expired File called");
-		JobOperator jo = BatchRuntime.getJobOperator();
-        long jid = jo.start("purge", new Properties());
-        LOGGER.log(Level.INFO, "batch job started with id: " + jid);
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
