@@ -51,33 +51,9 @@ public class JBossLoginContextFactory {
 			if (!configurationName.equals(name)) {
 				throw new IllegalArgumentException("Unexpected configuration name '" + name + "'");
 			}
-
-			return new AppConfigurationEntry[] {
-
-			createUsersRolesLoginModuleConfigEntry(),
-
-			createClientLoginModuleConfigEntry(),
-
-			};
+			return new AppConfigurationEntry[] { createClientLoginModuleConfigEntry(), };
 		}
 
-		/**
-		 * The {@link org.jboss.security.auth.spi.UsersRolesLoginModule} creates the association between users and roles.
-		 * 
-		 * @return
-		 */
-		private AppConfigurationEntry createUsersRolesLoginModuleConfigEntry() {
-			Map<String, String> options = new HashMap<String, String>();
-			return new AppConfigurationEntry("org.jboss.security.auth.spi.UsersRolesLoginModule", AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,
-					options);
-		}
-
-		/**
-		 * The {@link org.jboss.security.ClientLoginModule} associates the user credentials with the {@link org.jboss.security.SecurityContext} where the JBoss
-		 * security runtime can find it.
-		 * 
-		 * @return
-		 */
 		private AppConfigurationEntry createClientLoginModuleConfigEntry() {
 			Map<String, String> options = new HashMap<String, String>();
 			options.put("multi-threaded", "true");
@@ -87,11 +63,6 @@ public class JBossLoginContextFactory {
 		}
 	}
 
-	/**
-	 * Obtain a LoginContext configured for use with the ClientLoginModule.
-	 * 
-	 * @return the configured LoginContext.
-	 */
 	public static LoginContext createLoginContext(final String username, final String password) throws LoginException {
 		final String configurationName = "filestore";
 
