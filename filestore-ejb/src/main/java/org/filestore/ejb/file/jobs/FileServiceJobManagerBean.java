@@ -28,6 +28,7 @@ public class FileServiceJobManagerBean {
 		JobOperator jo = BatchRuntime.getJobOperator();
         long jid = jo.start("purge", new Properties());
         LOGGER.log(Level.INFO, "batch job started with id: " + jid);
+        LOGGER.log(Level.INFO, "batch job execution status: " + jo.getJobExecution(jid).getBatchStatus());
 	}
 	
 }

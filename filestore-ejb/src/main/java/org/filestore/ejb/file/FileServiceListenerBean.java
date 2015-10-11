@@ -29,6 +29,7 @@ public class FileServiceListenerBean implements MessageListener {
 	@Override
 	public void onMessage(javax.jms.Message msg) {
 		try {
+			
 			LOGGER.log(Level.INFO, "Message received, sending mails");
 			String owner = msg.getStringProperty("owner");
 			String id = msg.getStringProperty("id");

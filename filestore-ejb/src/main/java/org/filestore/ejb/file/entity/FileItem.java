@@ -8,8 +8,10 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -18,6 +20,7 @@ import javax.persistence.TemporalType;
 	@NamedQuery(name = "listAllFiles", query = "SELECT fi FROM FileItem fi"),
 	@NamedQuery(name = "findExpiredFiles", query = "SELECT fi FROM FileItem fi WHERE fi.lastdownload < :limit ORDER BY fi.lastdownload DESC") 
 })
+@Table(indexes={@Index(name="lastdownloadindex", columnList="lastdownload")})
 public class FileItem implements Serializable {
 
 	private static final long serialVersionUID = -1869502504816752908L;
