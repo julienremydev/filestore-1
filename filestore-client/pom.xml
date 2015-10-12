@@ -27,8 +27,8 @@
 		<dependency>
 			<groupId>org.wildfly</groupId>
 			<artifactId>wildfly-ejb-client-bom</artifactId>
-			<scope>runtime</scope>
 			<type>pom</type>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

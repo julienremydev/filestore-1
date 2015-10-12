@@ -110,6 +110,13 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+				<groupId>fr.miage.jayblanc</groupId>
+				<artifactId>filestore-client</artifactId>
+				<version>${project.version}</version>
+				<type>app-client</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>${version.junit}</version>
