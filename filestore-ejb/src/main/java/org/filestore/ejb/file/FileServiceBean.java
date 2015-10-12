@@ -37,7 +37,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @Interceptors ({FileServiceMetricsBean.class})
 @SecurityDomain("filestore")
 @PermitAll
-public class FileServiceBean implements FileService, FileServiceAdmin {
+public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
 	

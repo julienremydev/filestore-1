@@ -35,6 +35,8 @@ public class FileServiceTest {
 	private static EntityManagerFactory factory;
     private static EntityManager em;
     private static FileService service;
+    private static FileServiceLocal localService;
+    private static FileServiceAdmin adminService;
     private static BinaryStoreService store;
     private static Mockery context = new Mockery();
 
@@ -59,6 +61,8 @@ public class FileServiceTest {
         LOGGER.log(Level.INFO, "Building FileService");
         service = new FileServiceBean();
         ((FileServiceBean)service).em = em;
+        localService = (FileServiceLocal) service;
+        adminService = (FileServiceAdmin) service;
         
         store = context.mock(BinaryStoreService.class);
         ((FileServiceBean)service).store = store;
@@ -99,7 +103,7 @@ public class FileServiceTest {
 	    	receivers.add("sheldon@test.com");
 	    	receivers.add("rajesh@test.com");
 	    	receivers.add("penny@test.com");
-	    	String key = service.postFile("jayblanc@gmail.com", receivers, "Bazinga", "The.Big.Bang.Theory.S06E01.mkv", content);
+	    	String key = localService.postFile("jayblanc@gmail.com", receivers, "Bazinga", "The.Big.Bang.Theory.S06E01.mkv", content);
 	    	assertNotNull(key);
 	    	
 	    	FileItem item = service.getFile(key);
@@ -107,7 +111,7 @@ public class FileServiceTest {
 	    	assertEquals("Bazinga", item.getMessage());
 	    	assertEquals("The.Big.Bang.Theory.S06E01.mkv", item.getName());
 	    	
-	    	service.deleteFile(key);
+	    	adminService.deleteFile(key);
 	    	try {
 	    		item = service.getFile(key);
 	    		fail("The file should not exists anymore !!");

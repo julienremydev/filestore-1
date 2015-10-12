@@ -12,5 +12,7 @@ public interface FileServiceAdmin {
 	public List<FileItem> listAllFiles() throws FileServiceException;
 	
 	public FileItem getNextStaleFile() throws FileServiceException;
+	
+	public void deleteFile(String id) throws FileServiceException;
 
 }

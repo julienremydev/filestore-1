@@ -14,6 +14,7 @@
 		<version.compiler.plugin>3.3</version.compiler.plugin>
 		<version.surefire.plugin>2.18.1</version.surefire.plugin>
 		<version.ear.plugin>2.10.1</version.ear.plugin>
+		<version.jar.plugin>2.6</version.jar.plugin>
 		<version.ejb.plugin>2.5.1</version.ejb.plugin>
 		<version.war.plugin>2.6</version.war.plugin>
 		<version.junit>4.12</version.junit>
@@ -23,6 +24,7 @@
 		<version.shrinkwrap-resolver>2.1.1</version.shrinkwrap-resolver>
 		<version.arquillian>1.1.9.Final</version.arquillian>
 		<version.wildfly-arquillian>8.2.1.Final</version.wildfly-arquillian>
+		<version.wildfly-client>9.0.1.Final</version.wildfly-client>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
 	</properties>
@@ -145,6 +147,12 @@
 				<artifactId>wildfly-arquillian-container-managed</artifactId>
 				<version>${version.wildfly-arquillian}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.wildfly</groupId>
+				<artifactId>wildfly-ejb-client-bom</artifactId>
+				<version>${version.wildfly-client}</version>
+				<type>pom</type>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -181,5 +189,6 @@
 		<module>filestore-ejb</module>
 		<module>filestore-web</module>
 		<module>filestore-ear</module>
+		<module>filestore-client</module>
 	</modules>
 </project>

@@ -8,7 +8,7 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Named;
 
-import org.filestore.ejb.file.FileService;
+import org.filestore.ejb.file.FileServiceAdmin;
 import org.filestore.ejb.file.FileServiceException;
 import org.filestore.ejb.file.entity.FileItem;
 
@@ -19,7 +19,7 @@ public class StaleFileProcessor implements ItemProcessor {
 	private static final Logger LOGGER = Logger.getLogger(StaleFileProcessor.class.getName());
 	
 	@EJB
-	private FileService service; 
+	private FileServiceAdmin service; 
 	
 	public StaleFileProcessor() {
     	LOGGER.log(Level.INFO, "stale file processor instanciated");
