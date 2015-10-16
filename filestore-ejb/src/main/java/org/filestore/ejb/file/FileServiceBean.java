@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSContext;
 import javax.jms.Topic;
+import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
@@ -37,6 +38,8 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @Interceptors ({FileServiceMetricsBean.class})
 @SecurityDomain("filestore")
 @PermitAll
+@WebService(serviceName = "FileService", portName = "File", name = "File", endpointInterface = "org.filestore.ejb.file.FileService",
+targetNamespace = "http://www.miage.fr/jayblanc/File")
 public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
