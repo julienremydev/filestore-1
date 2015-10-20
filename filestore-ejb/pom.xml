@@ -20,6 +20,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>fr.miage.jayblanc</groupId>
+			<artifactId>filestore-api</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

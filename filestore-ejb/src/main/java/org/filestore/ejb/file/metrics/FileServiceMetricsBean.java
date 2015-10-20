@@ -8,7 +8,8 @@ import javax.ejb.Stateless;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 
-import org.filestore.ejb.file.FileServiceException;
+import org.filestore.api.FileServiceException;
+import org.filestore.api.FileServiceMetrics;
 
 @Startup
 @Stateless(name = "fileservicemetrics")

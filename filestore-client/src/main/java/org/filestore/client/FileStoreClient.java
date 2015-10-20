@@ -22,8 +22,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.filestore.ejb.file.FileService;
-import org.filestore.ejb.file.FileServiceException;
+import org.filestore.api.FileService;
+import org.filestore.api.FileServiceException;
 
 public class FileStoreClient {
 

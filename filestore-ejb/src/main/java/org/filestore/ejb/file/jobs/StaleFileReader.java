@@ -7,9 +7,9 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.ejb.EJB;
 import javax.inject.Named;
 
-import org.filestore.ejb.file.FileServiceAdmin;
-import org.filestore.ejb.file.FileServiceException;
-import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.api.FileItem;
+import org.filestore.api.FileServiceAdmin;
+import org.filestore.api.FileServiceException;
 
 @Named(value="staleFileReader")
 public class StaleFileReader extends AbstractItemReader {

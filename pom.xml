@@ -98,6 +98,13 @@
 			</dependency>
 			<dependency>
 				<groupId>fr.miage.jayblanc</groupId>
+				<artifactId>filestore-api</artifactId>
+				<version>${project.version}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>fr.miage.jayblanc</groupId>
 				<artifactId>filestore-ejb</artifactId>
 				<version>${project.version}</version>
 				<type>ejb</type>
@@ -200,6 +207,7 @@
 	</build>
 
 	<modules>
+		<module>filestore-api</module>
 		<module>filestore-ejb</module>
 		<module>filestore-web</module>
 		<module>filestore-ear</module>

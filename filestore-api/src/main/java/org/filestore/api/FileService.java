@@ -1,10 +1,8 @@
-package org.filestore.ejb.file;
+package org.filestore.api;
 
 import java.util.List;
 
 import javax.ejb.Remote;
-
-import org.filestore.ejb.file.entity.FileItem;
 
 @Remote
 public interface FileService {

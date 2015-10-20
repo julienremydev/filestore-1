@@ -18,7 +18,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.RollbackException;
 
-import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.api.FileItem;
+import org.filestore.api.FileService;
+import org.filestore.api.FileServiceAdmin;
+import org.filestore.api.FileServiceException;
+import org.filestore.api.FileServiceLocal;
 import org.filestore.ejb.store.BinaryStoreService;
 import org.filestore.ejb.store.BinaryStoreServiceException;
 import org.filestore.ejb.store.BinaryStreamNotFoundException;

@@ -8,9 +8,10 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.ejb.EJB;
 import javax.inject.Named;
 
-import org.filestore.ejb.file.FileServiceAdmin;
-import org.filestore.ejb.file.FileServiceException;
-import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.api.FileItem;
+import org.filestore.api.FileServiceAdmin;
+import org.filestore.api.FileServiceException;
+import org.filestore.ejb.file.entity.FileItemEntity;
 
 @Named(value="staleFileProcessor")
 @RunAs("system")
@@ -27,12 +28,12 @@ public class StaleFileProcessor implements ItemProcessor {
 
 	@Override
 	public String processItem(Object item) {
-		LOGGER.log(Level.INFO, "processing file item : " + ((FileItem)item).getId());
+		LOGGER.log(Level.INFO, "processing file item : " + ((FileItemEntity)item).getId());
 		try {
 			service.deleteFile(((FileItem)item).getId());
 			return ((FileItem)item).getId();
 		} catch ( FileServiceException e ) {
-			LOGGER.log(Level.INFO, "unable to process file item : " + ((FileItem)item).getId(), e);
+			LOGGER.log(Level.INFO, "unable to process file item : " + ((FileItemEntity)item).getId(), e);
 			return null;
 		}
 	}

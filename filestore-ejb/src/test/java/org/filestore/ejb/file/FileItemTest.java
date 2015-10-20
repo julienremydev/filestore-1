@@ -16,7 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.ejb.file.entity.FileItemEntity;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class FileItemTest {
         try {
             em.getTransaction().begin();
 
-            FileItem file = new FileItem();
+            FileItemEntity file = new FileItemEntity();
             file.setId("myid");
             file.setName("Tagada");
             file.setLength(10);
@@ -84,7 +84,7 @@ public class FileItemTest {
             em.persist(file);
             assertTrue(em.contains(file));
             
-            FileItem file2 = em.find(FileItem.class, "myid");
+            FileItemEntity file2 = em.find(FileItemEntity.class, "myid");
             assertNotNull(file2);
             assertEquals(file, file2);
             
@@ -95,13 +95,13 @@ public class FileItemTest {
             receivers.add("user2@test.com");
             file2.setReceivers(receivers);
             em.merge(file2);
-            FileItem file3 = em.find(FileItem.class, "myid");
+            FileItemEntity file3 = em.find(FileItemEntity.class, "myid");
             assertEquals("A new Name", file3.getName());
             
-            List<FileItem> items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+            List<FileItemEntity> items = em.createNamedQuery("listAllFiles", FileItemEntity.class).getResultList();
             assertEquals(1, items.size());
             
-            FileItem file4 = new FileItem();
+            FileItemEntity file4 = new FileItemEntity();
             file4.setId("myid2");
             file4.setName("Tagada2");
             file4.setLength(20);
@@ -114,10 +114,10 @@ public class FileItemTest {
             file4.setReceivers(receivers4);
             em.persist(file4);
             
-            items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+            items = em.createNamedQuery("listAllFiles", FileItemEntity.class).getResultList();
             assertEquals(2, items.size());
             
-            FileItem file5 = em.find(FileItem.class, "myid2");
+            FileItemEntity file5 = em.find(FileItemEntity.class, "myid2");
             assertEquals(2, file5.getReceivers().size());
             for ( String receiver : file5.getReceivers() ) {
             	LOGGER.log(Level.INFO, "receiver: " + receiver);

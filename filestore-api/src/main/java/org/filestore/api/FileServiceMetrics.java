@@ -1,8 +1,8 @@
-package org.filestore.ejb.file.metrics;
+package org.filestore.api;
 
 import javax.ejb.Local;
 
-import org.filestore.ejb.file.FileServiceException;
+import org.filestore.api.FileServiceException;
 
 @Local
 public interface FileServiceMetrics {
