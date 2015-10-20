@@ -73,6 +73,7 @@
 				<version>${version.ejb.plugin}</version>
 				<configuration>
 					<ejbVersion>3.2</ejbVersion>
+					<addClasspath>true</addClasspath>
 				</configuration>
 			</plugin>
 		</plugins>
