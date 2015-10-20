@@ -23,6 +23,7 @@
 			<groupId>fr.miage.jayblanc</groupId>
 			<artifactId>filestore-api</artifactId>
 			<type>jar</type>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

@@ -22,7 +22,7 @@ import org.filestore.api.FileItem;
 	@NamedQuery(name = "findExpiredFiles", query = "SELECT fi FROM FileItemEntity fi WHERE fi.lastdownload < :limit ORDER BY fi.lastdownload DESC") 
 })
 @Table(indexes={@Index(name="lastdownloadindex", columnList="lastdownload")})
-public class FileItemEntity implements FileItem {
+public class FileItemEntity extends FileItem {
 
 	private static final long serialVersionUID = -1869502504816752908L;
 

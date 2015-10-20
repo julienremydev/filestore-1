@@ -44,7 +44,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @Interceptors ({FileServiceMetricsBean.class})
 @SecurityDomain("filestore")
 @PermitAll
-@WebService(serviceName = "FileService", portName = "File", name = "File", endpointInterface = "org.filestore.ejb.file.FileService",
+@WebService(serviceName = "FileService", portName = "File", name = "File", endpointInterface = "org.filestore.api.FileService",
 targetNamespace = "http://www.miage.fr/jayblanc/File")
 public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	

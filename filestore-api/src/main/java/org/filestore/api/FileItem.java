@@ -4,26 +4,28 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public interface FileItem extends Serializable {
+public abstract class FileItem implements Serializable {
 
-	public String getId();
+	private static final long serialVersionUID = 1L;
 
-	public String getName();
+	public abstract String getId();
+
+	public abstract String getName();
 	
-	public String getType();
+	public abstract String getType();
 	
-	public long getLength();
+	public abstract long getLength();
 
-	public long getNbdownloads();
+	public abstract long getNbdownloads();
 	
-	public String getOwner();
+	public abstract String getOwner();
 
-	public List<String> getReceivers();
+	public abstract List<String> getReceivers();
 
-	public String getMessage();
+	public abstract String getMessage();
 
-	public Date getCreation();
+	public abstract Date getCreation();
 
-	public Date getLastdownload();
+	public abstract Date getLastdownload();
 
 }
