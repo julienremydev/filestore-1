@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 
-import org.filestore.ejb.file.entity.FileItem;
+import org.filestore.api.FileItem;
+import org.filestore.api.FileService;
+import org.filestore.api.FileServiceAdmin;
+import org.filestore.api.FileServiceException;
+import org.filestore.api.FileServiceLocal;
+import org.filestore.ejb.file.entity.FileItemEntity;
 import org.filestore.ejb.file.metrics.FileServiceMetricsBean;
 import org.filestore.ejb.store.BinaryStoreService;
 import org.filestore.ejb.store.BinaryStoreServiceException;
@@ -74,7 +80,7 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 		try {
 			String streamid = store.put(stream);
 			String id = UUID.randomUUID().toString().replaceAll("-", "");
-			FileItem file = new FileItem();
+			FileItemEntity file = new FileItemEntity();
 			file.setId(id);
 			file.setOwner(owner);
 			file.setReceivers(receivers);
@@ -100,7 +106,7 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	public FileItem getFile(String id) throws FileServiceException {
 		LOGGER.log(Level.INFO, "Get File called");
 		try {
-			FileItem item = em.find(FileItem.class, id);
+			FileItemEntity item = em.find(FileItemEntity.class, id);
 			if ( item == null ) {
 				throw new FileServiceException("Unable to get file with id '" + id + "' : file does not exists");
 			}
@@ -147,7 +153,7 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private InputStream internalGetFileContent(String id) throws FileServiceException {
 		try {
-			FileItem item = em.find(FileItem.class, id);
+			FileItemEntity item = em.find(FileItemEntity.class, id);
 			if ( item == null ) {
 				throw new FileServiceException("Unable to get file with id '" + id + "' : file does not exists");
 			}
@@ -170,7 +176,7 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	public void deleteFile(String id) throws FileServiceException {
 		LOGGER.log(Level.INFO, "Delete File called");
 		try {
-			FileItem item = em.find(FileItem.class, id);
+			FileItemEntity item = em.find(FileItemEntity.class, id);
 			if ( item == null ) {
 				throw new FileServiceException("Unable to delete file with id '" + id + "' : file does not exists");
 			}
@@ -192,18 +198,20 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	public List<FileItem> listAllFiles() throws FileServiceException {
 		LOGGER.log(Level.INFO, "Listing all files");
-		List<FileItem> items = em.createNamedQuery("listAllFiles", FileItem.class).getResultList();
+		List<FileItemEntity> results = em.createNamedQuery("listAllFiles", FileItemEntity.class).getResultList();
+		List<FileItem> items = new ArrayList<FileItem>();
+		items.addAll(results);
 		return items;
 	}
 
 	@Override
 	@RolesAllowed({"admin", "system"})
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
-	public FileItem getNextStaleFile() throws FileServiceException {
+	public FileItemEntity getNextStaleFile() throws FileServiceException {
 		LOGGER.log(Level.INFO, "Getting next stale files");
 		Date limit = new Date(System.currentTimeMillis() - 60000);
 		try {
-			FileItem item = em.createNamedQuery("findExpiredFiles", FileItem.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).setMaxResults(1).getSingleResult();
+			FileItemEntity item = em.createNamedQuery("findExpiredFiles", FileItemEntity.class).setParameter("limit", limit,  TemporalType.TIMESTAMP).setMaxResults(1).getSingleResult();
 			LOGGER.log(Level.INFO, "next stale file item found: " + item.getId());
 			return item;
 		} catch ( Exception e ) {

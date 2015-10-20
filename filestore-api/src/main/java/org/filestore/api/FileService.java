@@ -1,4 +1,4 @@
-package org.filestore.ejb.file;
+package org.filestore.api;
 
 import java.util.List;
 
@@ -6,8 +6,6 @@ import javax.ejb.Remote;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-
-import org.filestore.ejb.file.entity.FileItem;
 
 @Remote
 @WebService

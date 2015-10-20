@@ -16,14 +16,19 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.filestore.ejb.file.entity.FileItem;
-import org.filestore.ejb.file.metrics.FileServiceMetrics;
+import org.filestore.api.FileItem;
+import org.filestore.api.FileService;
+import org.filestore.api.FileServiceAdmin;
+import org.filestore.api.FileServiceException;
+import org.filestore.api.FileServiceMetrics;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,8 +59,11 @@ public class FileServiceMetricsTest {
 		jar.addAsManifestResource("META-INF/batch-jobs/purge.xml", "META-INF/batch-jobs/purge.xml");
 		LOGGER.log(Level.INFO, "Created JAR for test : " + jar.toString(true));
 
+		PomEquippedResolveStage pom = Maven.resolver().loadPomFromFile("pom.xml");
+		
 		EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "filestore-ear.ear");
 		ear.addAsModule(jar);
+		ear.addAsLibraries(pom.resolve("fr.miage.jayblanc:filestore-api").withTransitivity().asFile());
 		LOGGER.log(Level.INFO, "Created EAR for test : " + ear.toString(true));
 
 		return ear;
@@ -93,7 +101,7 @@ public class FileServiceMetricsTest {
 				@Override
 				public List<FileItem> run() {
 					try {
-						List<FileItem> items = admin.listAllFiles();
+						List<FileItem> items = (List<FileItem>) admin.listAllFiles();
 						return items;
 					} catch (FileServiceException e) {
 						e.printStackTrace();

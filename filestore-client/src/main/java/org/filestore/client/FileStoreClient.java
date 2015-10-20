@@ -16,8 +16,14 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.filestore.ejb.file.FileService;
-import org.filestore.ejb.file.FileServiceException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.filestore.api.FileService;
+import org.filestore.api.FileServiceException;
 
 public class FileStoreClient {
 
@@ -27,8 +33,10 @@ public class FileStoreClient {
 	private static boolean isInAppclient;
 	@EJB
 	private FileService service;
+	private String host;
 
-	public FileStoreClient() {
+	public FileStoreClient(String host) {
+		this.host = host;
 	}
 
 	public FileService getFileServiceRemote() throws NamingException {
@@ -36,7 +44,7 @@ public class FileStoreClient {
 			LOGGER.log(Level.INFO, "getting FileSerive using remote-naming");
 			final Properties env = new Properties();
 			env.put(Context.INITIAL_CONTEXT_FACTORY,"org.jboss.naming.remote.client.InitialContextFactory");
-			env.put(Context.PROVIDER_URL, "http-remoting://localhost:8080");
+			env.put(Context.PROVIDER_URL, "http-remoting://" + host + ":8080");
 			InitialContext context = new InitialContext(env);
 			service = (FileService) context.lookup("filestore-ear/filestore-ejb/fileservice!org.filestore.ejb.file.FileService");
 			context.close();
@@ -69,11 +77,31 @@ public class FileStoreClient {
 	}
 
 	public static void main(String args[]) throws FileServiceException,
-			IOException, NamingException {
-		FileStoreClient client = new FileStoreClient();
-		Path path = Paths.get(args[3]);
-		client.postFile(args[0], Arrays.asList(args[1].split(",")), args[2],
-				path.getFileName().toString(), path);
+			IOException, NamingException, ParseException {
+		Options options = new Options();
+		options.addOption("s", "sender", true, "sender email adresse");
+		Option r = new Option("r", "receivers", true, "receivers email adresses (coma separated)");
+		r.setRequired(true);
+		r.setValueSeparator(',');
+		options.addOption(r);
+		options.addOption("m", "message", true, "message for receivers");
+		Option p = new Option("p", "path", true, "file path to send");
+		p.setRequired(true);
+		options.addOption(p);
+		options.addOption("h", "host", true, "server hostname (default to localhost)");
+		
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = parser.parse( options, args);
+		
+		String sender = cmd.getOptionValue("s", "root@localhost");
+		String message = cmd.getOptionValue("m", "I have a file for you...");
+		String host = cmd.getOptionValue("h", "localhost");
+		String[] receivers = cmd.getOptionValues("r");
+		Path path = Paths.get(cmd.getOptionValue("p"));
+		
+		
+		FileStoreClient client = new FileStoreClient(host);
+		client.postFile(sender, Arrays.asList(receivers), message,path.getFileName().toString(), path);
 	}
 
 }

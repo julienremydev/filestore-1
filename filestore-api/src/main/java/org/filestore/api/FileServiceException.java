@@ -1,4 +1,4 @@
-package org.filestore.ejb.file;
+package org.filestore.api;
 
 public class FileServiceException extends Exception {
 

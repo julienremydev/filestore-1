@@ -1,4 +1,4 @@
-package org.filestore.ejb.file;
+package org.filestore.api;
 
 import java.io.InputStream;
 import java.util.List;

@@ -20,6 +20,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>fr.miage.jayblanc</groupId>
+			<artifactId>filestore-api</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -73,6 +78,7 @@
 				<version>${version.ejb.plugin}</version>
 				<configuration>
 					<ejbVersion>3.2</ejbVersion>
+					<addClasspath>true</addClasspath>
 				</configuration>
 			</plugin>
 		</plugins>
