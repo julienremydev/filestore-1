@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.jms.JMSContext;
 import javax.jms.Topic;
+import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -45,6 +46,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @SecurityDomain("filestore")
 @PermitAll
 @WebService(endpointInterface = "org.filestore.api.FileService")
+@HandlerChain(file="/handler-chain.xml")
 public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
