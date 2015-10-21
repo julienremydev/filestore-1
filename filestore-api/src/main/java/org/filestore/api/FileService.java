@@ -12,15 +12,15 @@ import javax.jws.WebService;
 @WebService
 public interface FileService {
 	
-	@WebMethod(action="post-file")
+	@WebMethod(operationName="postfile")
 	public String postFile(@WebParam(name="owner") String owner, @WebParam(name="receivers") List<String> receivers, @WebParam(name="message") String message, @WebParam(name="filename") String name, @WebParam(name="filecontent") byte[] data) throws FileServiceException;
 	
-	@WebMethod(action="get-file")
-	@WebResult(name="file-item")
+	@WebMethod(operationName="getfile")
+	@WebResult(name="fileitem")
 	public FileItem getFile(@WebParam(name="id") String id) throws FileServiceException;
 	
-	@WebMethod(action="get-file-content")
-	@WebResult(name="file-content")
+	@WebMethod(operationName="getfilecontent")
+	@WebResult(name="filecontent")
 	public byte[] getWholeFileContent(@WebParam(name="id") String id) throws FileServiceException;
 
 }
