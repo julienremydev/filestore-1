@@ -46,7 +46,7 @@ public class FileStoreClient {
 			env.put(Context.INITIAL_CONTEXT_FACTORY,"org.jboss.naming.remote.client.InitialContextFactory");
 			env.put(Context.PROVIDER_URL, "http-remoting://" + host + ":8080");
 			InitialContext context = new InitialContext(env);
-			service = (FileService) context.lookup("filestore-ear/filestore-ejb/fileservice!org.filestore.ejb.file.FileService");
+			service = (FileService) context.lookup("filestore-ear/filestore-ejb/fileservice!org.filestore.api.FileService");
 			context.close();
 		}
 		return service;
@@ -59,7 +59,7 @@ public class FileStoreClient {
 			env.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
 			env.put("jboss.naming.client.ejb.context",true);
 			InitialContext context = new InitialContext(env);
-			service = (FileService) context.lookup("ejb:filestore-ear/filestore-ejb/fileservice!org.filestore.ejb.file.FileService");
+			service = (FileService) context.lookup("ejb:filestore-ear/filestore-ejb/fileservice!org.filestore.api.FileService");
 			context.close();
 		}
 		return service;

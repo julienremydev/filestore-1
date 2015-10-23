@@ -18,13 +18,11 @@
 			<groupId>fr.miage.jayblanc</groupId>
 			<artifactId>filestore-ejb</artifactId>
 			<type>ejb</type>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.miage.jayblanc</groupId>
 			<artifactId>filestore-web</artifactId>
 			<type>war</type>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

@@ -101,28 +101,24 @@
 				<artifactId>filestore-api</artifactId>
 				<version>${project.version}</version>
 				<type>jar</type>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>fr.miage.jayblanc</groupId>
 				<artifactId>filestore-ejb</artifactId>
 				<version>${project.version}</version>
 				<type>ejb</type>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>fr.miage.jayblanc</groupId>
 				<artifactId>filestore-web</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>fr.miage.jayblanc</groupId>
 				<artifactId>filestore-client</artifactId>
 				<version>${project.version}</version>
 				<type>app-client</type>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
