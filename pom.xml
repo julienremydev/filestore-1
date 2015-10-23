@@ -17,6 +17,7 @@
 		<version.jar.plugin>2.6</version.jar.plugin>
 		<version.ejb.plugin>2.5.1</version.ejb.plugin>
 		<version.war.plugin>2.6</version.war.plugin>
+		<version.dependency.plugin>2.10</version.dependency.plugin>
 		<version.junit>4.12</version.junit>
 		<version.jmock>2.8.1</version.jmock>
 		<version.javaee>7.0</version.javaee>
@@ -26,6 +27,8 @@
 		<version.wildfly-arquillian>8.2.1.Final</version.wildfly-arquillian>
 		<version.wildfly-client>9.0.1.Final</version.wildfly-client>
 		<version.commons-cli>1.3.1</version.commons-cli>
+		<version.onejar.plugin>1.4.4</version.onejar.plugin>
+		<version.jaxws.plugin>1.12</version.jaxws.plugin>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<maven.compiler.source>1.7</maven.compiler.source>
 	</properties>
@@ -63,6 +66,10 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>onejar-maven-plugin.googlecode.com</id>
+			<url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -198,6 +205,16 @@
 						<skip>true</skip>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>jaxws-maven-plugin</artifactId>
+					<version>${version.jaxws.plugin}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.dstovall</groupId>
+					<artifactId>onejar-maven-plugin</artifactId>
+					<version>${version.onejar.plugin}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -208,5 +225,6 @@
 		<module>filestore-web</module>
 		<module>filestore-ear</module>
 		<module>filestore-client</module>
+		<module>filestore-wsclient</module>
 	</modules>
 </project>
