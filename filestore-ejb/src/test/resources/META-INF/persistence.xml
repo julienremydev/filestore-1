@@ -4,7 +4,7 @@
 	version="2.1">
 	<persistence-unit name="testPU" transaction-type="RESOURCE_LOCAL">
 	    <provider>org.hibernate.ejb.HibernatePersistence</provider>
-	    <class>org.filestore.ejb.file.entity.FileItem</class>
+	    <class>org.filestore.ejb.file.entity.FileItemEntity</class>
 	    <exclude-unlisted-classes>true</exclude-unlisted-classes>
 	    <properties>
 	        <property name="hibernate.connection.url" value="jdbc:derby:memory:unit-testing-jpa"/>
