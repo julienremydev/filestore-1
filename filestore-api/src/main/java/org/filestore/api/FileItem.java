@@ -7,23 +7,28 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name="file")
+@XmlType(name="file-item")
 public abstract class FileItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute
+	@XmlAttribute(name="id")
 	public abstract String getId();
 
+	@XmlElement(name="name")
 	public abstract String getName();
 	
+	@XmlElement(name="type")
 	public abstract String getType();
 	
 	public abstract long getLength();
 
 	public abstract long getNbdownloads();
 	
+	@XmlElement(name="owner")
 	public abstract String getOwner();
 
 	@XmlTransient
