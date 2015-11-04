@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -28,6 +31,7 @@ import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
+import javax.xml.ws.soap.MTOM;
 
 import org.filestore.api.FileItem;
 import org.filestore.api.FileService;
@@ -47,6 +51,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @PermitAll
 @WebService(endpointInterface = "org.filestore.api.FileService")
 @HandlerChain(file="/handler-chain.xml")
+@MTOM(enabled=true)
 public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
@@ -59,7 +64,7 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	protected BinaryStoreService store;
 	@Resource(mappedName = "java:jboss/exported/jms/topic/Notification")
 	private Topic notificationTopic;
-	@Inject
+	@Inject 
 	private JMSContext jmsctx;
 	
 	@Override
@@ -67,6 +72,17 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 	public String postFile(String owner, List<String> receivers, String message, String name, byte[] data) throws FileServiceException {
 		LOGGER.log(Level.INFO, "Post File called (byte[])");
 		return this.internalPostFile(owner, receivers, message, name, new ByteArrayInputStream(data));
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public String postFile(String owner, List<String> receivers, String message, String name, DataHandler data) throws FileServiceException {
+		LOGGER.log(Level.INFO, "Post File called (DataHandler)");
+		try {
+			return this.internalPostFile(owner, receivers, message, name, data.getInputStream());
+		} catch (IOException e) {
+			throw new FileServiceException("error during posting file", e);
+		}
 	}
 	
 	@Override
@@ -149,6 +165,14 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 			}
 		}
 		return baos.toByteArray();
+	}
+	
+	@Override
+	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+	public DataHandler getFileData(String id) throws FileServiceException {
+		LOGGER.log(Level.INFO, "Get File Data called");
+		InputStream is = this.internalGetFileContent(id);
+		return new DataHandler(new InputStreamDataSource(is));
 	}
 	
 	@TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -240,6 +264,34 @@ public class FileServiceBean implements FileService, FileServiceLocal, FileServi
 			LOGGER.log(Level.WARNING, "unable to notify", e);
 			throw new FileServiceException("unable to notify", e);
 		}
+	}
+	
+	class InputStreamDataSource implements DataSource {
+		private InputStream inputStream;
+
+	    public InputStreamDataSource(InputStream inputStream) {
+	        this.inputStream = inputStream;
+	    }
+
+	    @Override
+	    public InputStream getInputStream() throws IOException {
+	        return inputStream;
+	    }
+
+	    @Override
+	    public OutputStream getOutputStream() throws IOException {
+	        throw new UnsupportedOperationException("Not implemented");
+	    }
+
+	    @Override
+	    public String getContentType() {
+	        return "*/*";
+	    }
+
+	    @Override
+	    public String getName() {
+	        return "InputStreamDataSource";
+	    }
 	}
 
 }
