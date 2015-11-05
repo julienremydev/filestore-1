@@ -51,6 +51,15 @@
 							<contextRoot>/</contextRoot>
 						</webModule>
 					</modules>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<Artefact-Version>${project.version}</Artefact-Version>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>

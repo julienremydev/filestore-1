@@ -18,6 +18,7 @@
 		<version.ejb.plugin>2.5.1</version.ejb.plugin>
 		<version.war.plugin>2.6</version.war.plugin>
 		<version.dependency.plugin>2.10</version.dependency.plugin>
+		<version.jboss.resteasy>3.0.11.Final</version.jboss.resteasy>
 		<version.junit>4.12</version.junit>
 		<version.jmock>2.8.1</version.jmock>
 		<version.javaee>7.0</version.javaee>
