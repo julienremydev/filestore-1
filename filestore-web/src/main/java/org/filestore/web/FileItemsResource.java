@@ -28,16 +28,15 @@ import org.filestore.api.FileService;
 import org.filestore.api.FileServiceAdmin;
 import org.filestore.api.FileServiceException;
 import org.filestore.api.FileServiceLocal;
-import org.filestore.api.FileServiceMetrics;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 @Path("/files")
 @RequestScoped
 @Produces({ MediaType.APPLICATION_JSON })
-public class FileItemResource {
+public class FileItemsResource {
 	
-	private static final Logger LOGGER = Logger.getLogger(FileItemResource.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(FileItemsResource.class.getName());
 	
 	@EJB
 	private FileService fileService;
@@ -45,10 +44,8 @@ public class FileItemResource {
 	private FileServiceLocal fileServiceLocal;
 	@EJB
 	private FileServiceAdmin fileServiceAdmin;
-	@EJB
-	private FileServiceMetrics fileServiceMetrics;
 	
-	public FileItemResource () {
+	public FileItemsResource () {
 	}
 
 	@GET

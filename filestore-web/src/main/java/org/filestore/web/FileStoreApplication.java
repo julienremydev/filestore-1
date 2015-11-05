@@ -12,7 +12,8 @@ public class FileStoreApplication extends Application {
 	private HashSet<Class<?>> classes = new HashSet<Class<?>>();
 
 	public FileStoreApplication() {
-		classes.add(FileItemResource.class);
+		classes.add(FileItemsResource.class);
+		classes.add(FileMetricsResource.class);
 	}
 
 	@Override

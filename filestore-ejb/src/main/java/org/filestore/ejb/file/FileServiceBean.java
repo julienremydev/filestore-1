@@ -31,7 +31,9 @@ import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
+import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.filestore.api.FileItem;
 import org.filestore.api.FileService;
@@ -52,6 +54,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 @WebService(endpointInterface = "org.filestore.api.FileService")
 @HandlerChain(file="/handler-chain.xml")
 @MTOM(enabled=true)
+@BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
 public class FileServiceBean implements FileService, FileServiceLocal, FileServiceAdmin {
 	
 	private static final Logger LOGGER = Logger.getLogger(FileServiceBean.class.getName());
