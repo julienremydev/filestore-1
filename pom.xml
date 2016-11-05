@@ -219,7 +219,7 @@
 					<version>${version.jaxws.plugin}</version>
 				</plugin>
 				<plugin>
-					<groupId>org.dstovall</groupId>
+					<groupId>com.jolira</groupId>
 					<artifactId>onejar-maven-plugin</artifactId>
 					<version>${version.onejar.plugin}</version>
 				</plugin>
