@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -36,9 +38,9 @@ public class FileStoreWSClient {
 		Path path = Paths.get(cmd.getOptionValue("p"));
 
 		byte[] content = Files.readAllBytes(path);
-		StringArray sareceivers = new StringArray();
-		sareceivers.item = Arrays.asList(receivers);
-		new FileServiceBeanService().getFileServiceBeanPort().postfile(sender, sareceivers, message, path.getFileName().toString(), content);
+		List<String> lreceivers = new ArrayList();
+		lreceivers = Arrays.asList(receivers);
+		new FileServiceBeanService().getFileServiceBeanPort().postfile(sender, lreceivers, message, path.getFileName().toString(), content);
 	}
 
 }
