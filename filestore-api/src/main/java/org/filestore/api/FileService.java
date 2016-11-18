@@ -15,6 +15,7 @@ import javax.xml.ws.soap.MTOM;
 @Remote
 @WebService
 @MTOM(enabled=true)
+@SOAPBinding(style=Style.RPC)
 public interface FileService {
 	
 	@WebMethod(operationName="postfile")
