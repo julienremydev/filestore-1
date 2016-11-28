@@ -248,7 +248,7 @@
 						<version>2.4</version>
 						<configuration>
 							<outputDirectory>deployments</outputDirectory>
-							<warName>filetore-web/target/filestore-web.war</warName>
+							<warName>filestore-web.war</warName>
 						</configuration>
 					</plugin>
 				</plugins>
