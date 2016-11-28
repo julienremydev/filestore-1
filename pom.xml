@@ -210,6 +210,7 @@
 					<version>${version.wildfly.maven.plugin}</version>
 					<inherited>true</inherited>
 					<configuration>
+						<server-config>standalone-full.xml</server-config>  
 						<skip>true</skip>
 					</configuration>
 				</plugin>
